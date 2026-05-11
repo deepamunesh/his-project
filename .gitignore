@@ -1,0 +1,24 @@
+# IntelliJ
+.idea/
+*.iml
+
+# Maven
+target/
+
+# Build folders
+out/
+build/
+
+# Java
+*.class
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temp repo
+temp-repo/
+
+# Lombok jar
+lib/lombok-*.jar
