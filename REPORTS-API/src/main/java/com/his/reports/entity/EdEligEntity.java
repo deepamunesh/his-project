@@ -35,7 +35,7 @@ public class EdEligEntity {
     @Column(name = "DENIAL_REASON")
     private String denialReason;
 
-    @Column(name = "PLANL_NAME")
+    @Column(name = "PLAN_NAME")
     private String planName;
 
     // getters & setters

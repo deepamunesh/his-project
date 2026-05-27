@@ -17,6 +17,7 @@ public class BiPaymentController {
 
     @GetMapping("/payments")
     public ResponseEntity<List<BiPaymentDto>> getAllPayments() {
+
         return ResponseEntity.ok(biService.getAllPayments());
     }
 
