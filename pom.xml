@@ -22,6 +22,7 @@
         <module>REPORTS-API</module>
         <module>ssa-web-service</module>
         <module>ar-service</module>
+        <module>ED-RULES-API</module>
     </modules>
 
     <properties>
