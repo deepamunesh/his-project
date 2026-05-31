@@ -25,7 +25,6 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
-                    // Map service folder → ECR repo name
                     def services = [
                         'API-GATEWAY'                  : 'api-gateway',
                         'AUTH-SERVICE'                 : 'auth-service',
@@ -42,17 +41,21 @@ pipeline {
                         'EUREKA-SERVER'                : 'eureka-server'
                     ]
 
-                    // Login once before loop
-                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
-
-                    services.each { folder, repoName ->
+                    // AWS credentials binding
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
                         sh """
-                            cd ${folder}
-                            docker build -t ${repoName} .
-                            docker tag ${repoName}:latest ${ECR_REGISTRY}/${repoName}:latest
-                            docker push ${ECR_REGISTRY}/${repoName}:latest
-                            cd ..
+                            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
                         """
+
+                        services.each { folder, repoName ->
+                            sh """
+                                cd ${folder}
+                                docker build -t ${repoName} .
+                                docker tag ${repoName}:latest ${ECR_REGISTRY}/${repoName}:latest
+                                docker push ${ECR_REGISTRY}/${repoName}:latest
+                                cd ..
+                            """
+                        }
                     }
                 }
             }
