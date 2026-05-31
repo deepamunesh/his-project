@@ -37,7 +37,7 @@ pipeline {
                         'ED-RULES-API'                 : 'ed-rules-service',
                         'DATA-COLLECTION-API'          : 'data-collection-service',
                         'CORRESPONDENCE-API'           : 'correspondence-service',
-                        'BALANCE-ISSUANCE'             : 'balance-issuance-service',
+                        'BALLANCE-ISSUANCE'             : 'balance-issuance-service',
                         'REPORTS-API'                  : 'reports-service',
                         'CONFIG-SERVER'                : 'config-server',
                         'EUREKA-SERVER'                : 'eureka-server'
