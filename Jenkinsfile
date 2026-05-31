@@ -6,7 +6,8 @@ pipeline {
         AWS_REGION = "ap-south-1"
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         EC2_HOST = "ubuntu@52.66.168.244"
-        EC2_KEY = "/var/lib/jenkins/.ssh/his-key-ap-south-1.pem"
+        //Use OpenSSH compatible key
+        EC2_KEY = "/var/lib/jenkins/.ssh/his-key-ap-south-1-openssh.pem"
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
@@ -36,7 +37,7 @@ pipeline {
                         'ED-RULES-API'                 : 'ed-rules-service',
                         'DATA-COLLECTION-API'          : 'data-collection-service',
                         'CORRESPONDENCE-API'           : 'correspondence-service',
-                        'BALLANCE-ISSUANCE'            : 'balance-issuance-service',
+                        'BALANCE-ISSUANCE'             : 'balance-issuance-service',
                         'REPORTS-API'                  : 'reports-service',
                         'CONFIG-SERVER'                : 'config-server',
                         'EUREKA-SERVER'                : 'eureka-server'
