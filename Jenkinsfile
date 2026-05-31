@@ -6,7 +6,8 @@ pipeline {
         AWS_REGION = "ap-south-1"
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         EC2_HOST = "ubuntu@52.66.168.244"
-        EC2_KEY = "/d/HIS_Repos/his-key-ap-south-1.pem"
+        EC2_KEY = "/var/lib/jenkins/.ssh/his-key-ap-south-1.pem"
+        IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
     stages {
@@ -41,18 +42,15 @@ pipeline {
                         'EUREKA-SERVER'                : 'eureka-server'
                     ]
 
-                    // AWS credentials binding
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
-                        sh """
-                            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
-                        """
+                        sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
 
                         services.each { folder, repoName ->
                             sh """
                                 cd ${folder}
-                                docker build -t ${repoName} .
-                                docker tag ${repoName}:latest ${ECR_REGISTRY}/${repoName}:latest
-                                docker push ${ECR_REGISTRY}/${repoName}:latest
+                                docker build -t ${repoName}:${IMAGE_TAG} .
+                                docker tag ${repoName}:${IMAGE_TAG} ${ECR_REGISTRY}/${repoName}:${IMAGE_TAG}
+                                docker push ${ECR_REGISTRY}/${repoName}:${IMAGE_TAG}
                                 cd ..
                             """
                         }
@@ -61,14 +59,12 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
+        stage('Update Compose & Deploy') {
             steps {
                 sh """
-                    ssh -i ${EC2_KEY} ${EC2_HOST} '
-                        cd /home/ubuntu/his-deployment &&
-                        docker-compose pull &&
-                        docker-compose up -d
-                    '
+                    sed -i 's/:latest/:${IMAGE_TAG}/g' docker-compose.yml
+                    scp -i ${EC2_KEY} docker-compose.yml ${EC2_HOST}:/home/ubuntu/his-deployment/
+                    ssh -i ${EC2_KEY} ${EC2_HOST} 'cd /home/ubuntu/his-deployment && docker-compose pull && docker-compose up -d'
                 """
             }
         }
