@@ -1,5 +1,5 @@
 FROM eclipse-temurin:17-jdk
 WORKDIR /app
-COPY target/ed-rules-service-0.0.1-SNAPSHOT.jar app.jar
+COPY target/ED-RULES-API-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8085
 ENTRYPOINT ["java","-jar","app.jar"]
