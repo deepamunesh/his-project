@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  config-server:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/config-server:latest
+    container_name: config-server
+    ports:
+      - "8888:8888"
+
+  eureka-server:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/eureka-server:latest
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-server
+
+  api-gateway:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/api-gateway:latest
+    container_name: api-gateway
+    ports:
+      - "8090:8090"
+    depends_on:
+      - config-server
+      - eureka-server
+
+  # ... baaki services bhi same pattern me :latest
