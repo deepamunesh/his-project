@@ -5,7 +5,7 @@ pipeline {
         AWS_ACCOUNT_ID = "802749364888"
         AWS_REGION = "ap-south-1"
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        EC2_HOST = "ubuntu@13.205.117.50"
+        EC2_HOST = "ubuntu@52.66.168.244"
         EC2_KEY = "/d/HIS_Repos/his-key-ap-south-1.pem"
     }
 
