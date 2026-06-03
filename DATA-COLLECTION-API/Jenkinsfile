@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+    environment {
+        AWS_ACCOUNT_ID = "802749364888"
+        AWS_REGION = "ap-south-1"
+        ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+        IMAGE_TAG = "${BUILD_NUMBER}"
+        EC2_HOST = "ubuntu@52.66.168.244"
+        EC2_KEY = "/var/lib/jenkins/.ssh/his-key-ap-south-1-openssh.pem"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'develop', url: 'https://github.com/deepamunesh/his-project.git'
+            }
+        }
+        stage('Build JAR') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+        stage('Docker Build & Push') {
+            steps {
+                sh """
+                    docker build -t data-collection-service:${IMAGE_TAG} DATA-COLLECTION-API/
+                    docker tag data-collection-service:${IMAGE_TAG} ${ECR_REGISTRY}/data-collection-service:${IMAGE_TAG}
+                    docker push ${ECR_REGISTRY}/data-collection-service:${IMAGE_TAG}
+                """
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh """
+                    sed -i 's/data-collection-service:[0-9]\\+/:${IMAGE_TAG}/g docker-compose.yml
+                    scp -i ${EC2_KEY} docker-compose.yml ${EC2_HOST}:/home/ubuntu/his-deployment/
+                    ssh -i ${EC2_KEY} ${EC2_HOST} 'cd /home/ubuntu/his-deployment && docker-compose pull && docker-compose up -d'
+                """
+            }
+        }
+    }
+}
