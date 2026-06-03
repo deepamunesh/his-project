@@ -30,11 +30,11 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sh """
-                    sed -i 's/config-server:[0-9]\\+/:${IMAGE_TAG}/g docker-compose.yml
+                sh '''
+                    sed -i "s/config-server:[0-9]\\+/:${IMAGE_TAG}/g" docker-compose.yml
                     scp -i ${EC2_KEY} docker-compose.yml ${EC2_HOST}:/home/ubuntu/his-deployment/
-                    ssh -i ${EC2_KEY} ${EC2_HOST} 'cd /home/ubuntu/his-deployment && docker-compose pull && docker-compose up -d'
-                """
+                    ssh -i ${EC2_KEY} ${EC2_HOST} "cd /home/ubuntu/his-deployment && IMAGE_TAG=${BUILD_NUMBER} docker-compose pull && IMAGE_TAG=${BUILD_NUMBER} docker-compose up -d"
+                '''
             }
         }
     }
