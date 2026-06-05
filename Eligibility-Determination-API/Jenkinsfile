@@ -22,6 +22,10 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 sh """
+                    # --- AWS ECR Login Step Added ---
+                    # Without this, docker push fails with 403 Forbidden
+                    aws ecr get-login-password --region ${AWS_REGION} \
+                    | docker login --username AWS --password-stdin ${ECR_REGISTRY}
                     docker build -t eligibility-determination-service:${IMAGE_TAG} Eligibility-Determination-API/
                     docker tag eligibility-determination-service:${IMAGE_TAG} ${ECR_REGISTRY}/eligibility-determination-service:${IMAGE_TAG}
                     docker push ${ECR_REGISTRY}/eligibility-determination-service:${IMAGE_TAG}

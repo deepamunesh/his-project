@@ -31,6 +31,10 @@ pipeline {
          stage('Deploy') {
                     steps {
                         sh '''
+                            # --- AWS ECR Login Step Added ---
+                            # Without this, docker push fails with 403 Forbidden
+                            aws ecr get-login-password --region ${AWS_REGION} \
+                            | docker login --username AWS --password-stdin ${ECR_REGISTRY}
                             # Copy updated compose file to EC2
                             scp -i ${EC2_KEY} docker-compose.yml ${EC2_HOST}:/home/ubuntu/his-deployment/
 
