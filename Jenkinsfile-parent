@@ -11,67 +11,67 @@ pipeline {
     stages {
         stage('CONFIG-SERVER') {
             steps {
-                build job: 'CONFIG-SERVER-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                build job: 'HIS-Config-Server-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
         stage('EUREKA-SERVER') {
             steps {
-                build job: 'EUREKA-SERVER-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                build job: 'HIS-Eureka-Server-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
         stage('API-GATEWAY') {
             steps {
-                build job: 'API-GATEWAY-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                build job: 'HIS-API-Gateway-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
         stage('AUTH-SERVICE') {
             steps {
-                build job: 'AUTH-SERVICE-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                build job: 'HIS-Auth-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
-        stage('ar-service') {
+        stage('AR-SERVICE') {
             steps {
-                build job: 'ar-service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                build job: 'HIS-AR-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
         stage('DATA-COLLECTION-API') {
             steps {
-                build job: 'DATA-COLLECTION-API-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                build job: 'HIS-Data-Collection-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
-        stage('Eligibility-Determination-API') {
+        stage('ELIGIBILITY-DETERMINATION') {
             steps {
-                build job: 'Eligibility-Determination-API-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                build job: 'HIS-Eligibility-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
         stage('ED-RULES-API') {
             steps {
-                build job: 'ED-RULES-API-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                build job: 'HIS-ED-Rules-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
         stage('CORRESPONDENCE-API') {
             steps {
-                build job: 'CORRESPONDENCE-API-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                build job: 'HIS-Correspondence-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
         stage('BALLANCE-ISSUANCE') {
             steps {
-                build job: 'BALLANCE-ISSUANCE-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                build job: 'HIS-Ballance-Issuance-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
-        stage('HIS-ADMIN-API') {
+        stage('ADMIN-API') {
             steps {
-                build job: 'HIS-ADMIN-API-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                build job: 'HIS-Admin-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
         stage('REPORTS-API') {
             steps {
-                build job: 'REPORTS-API-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                build job: 'HIS-Reports-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
-        stage('ssa-web-service') {
+        stage('SSA-WEB-SERVICE') {
             steps {
-                build job: 'ssa-web-service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                build job: 'HIS-SSA-Web-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
 
