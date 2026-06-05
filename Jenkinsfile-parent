@@ -1,0 +1,87 @@
+pipeline {
+    agent any
+
+    environment {
+        // Dynamic IMAGE_TAG: use Jenkins build number
+        IMAGE_TAG = "${BUILD_NUMBER}"
+        AWS_ACCOUNT = "802749364888"
+        REGION = "ap-south-1"
+    }
+
+    stages {
+        stage('CONFIG-SERVER') {
+            steps {
+                build job: 'CONFIG-SERVER-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+            }
+        }
+        stage('EUREKA-SERVER') {
+            steps {
+                build job: 'EUREKA-SERVER-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+            }
+        }
+        stage('API-GATEWAY') {
+            steps {
+                build job: 'API-GATEWAY-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+            }
+        }
+        stage('AUTH-SERVICE') {
+            steps {
+                build job: 'AUTH-SERVICE-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+            }
+        }
+        stage('ar-service') {
+            steps {
+                build job: 'ar-service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+            }
+        }
+        stage('DATA-COLLECTION-API') {
+            steps {
+                build job: 'DATA-COLLECTION-API-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+            }
+        }
+        stage('Eligibility-Determination-API') {
+            steps {
+                build job: 'Eligibility-Determination-API-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+            }
+        }
+        stage('ED-RULES-API') {
+            steps {
+                build job: 'ED-RULES-API-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+            }
+        }
+        stage('CORRESPONDENCE-API') {
+            steps {
+                build job: 'CORRESPONDENCE-API-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+            }
+        }
+        stage('BALLANCE-ISSUANCE') {
+            steps {
+                build job: 'BALLANCE-ISSUANCE-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+            }
+        }
+        stage('HIS-ADMIN-API') {
+            steps {
+                build job: 'HIS-ADMIN-API-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+            }
+        }
+        stage('REPORTS-API') {
+            steps {
+                build job: 'REPORTS-API-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+            }
+        }
+        stage('ssa-web-service') {
+            steps {
+                build job: 'ssa-web-service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "HIS Full Stack Build + Push Completed"
+        }
+        failure {
+            echo "HIS Pipeline Failed"
+        }
+    }
+}
