@@ -74,6 +74,15 @@ pipeline {
                 build job: 'ssa-web-service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
+
+        stage('Deploy to EC2') {
+            steps {
+                sh '''
+                ssh -i /var/lib/jenkins/.ssh/his-key-ap-south-1-openssh.pem ubuntu@52.66.168.244 \
+                "cd /home/ubuntu/his-deployment && IMAGE_TAG=${IMAGE_TAG} docker-compose pull && IMAGE_TAG=${IMAGE_TAG} docker-compose up -d"
+                '''
+            }
+        }
     }
 
     post {
