@@ -8,7 +8,7 @@ pipeline {
         AWS_ACCOUNT_ID = "802749364888"
         AWS_REGION = "ap-south-1"
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        IMAGE_TAG = "${IMAGE_TAG}"
+        IMAGE_TAG = "${params.IMAGE_TAG}"
         EC2_HOST = "ubuntu@52.66.168.244"
         EC2_KEY = "/var/lib/jenkins/.ssh/his-key-ap-south-1-openssh.pem"
     }
@@ -43,7 +43,7 @@ pipeline {
                                 scp -i ${EC2_KEY} docker-compose.yml ${EC2_HOST}:/home/ubuntu/his-deployment/
 
                                 # Login to ECR and deploy with IMAGE_TAG
-                                ssh -i ${EC2_KEY} ${EC2_HOST} "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY} && cd /home/ubuntu/his-deployment && IMAGE_TAG=${BUILD_NUMBER} docker-compose pull && IMAGE_TAG=${BUILD_NUMBER} docker-compose up -d"
+                                ssh -i ${EC2_KEY} ${EC2_HOST} "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY} && cd /home/ubuntu/his-deployment && IMAGE_TAG=${IMAGE_TAG} docker-compose pull && IMAGE_TAG=${IMAGE_TAG} docker-compose up -d"
                             '''
                         }
                     }
