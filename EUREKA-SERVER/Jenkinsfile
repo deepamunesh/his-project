@@ -23,22 +23,43 @@ pipeline {
                 sh 'mvn clean package -DskipTests'
             }
         }
-        stage('Docker Build & Push') {
+      stage('Docker Build & Push') {
             steps {
                 sh """
+                    # --- AWS ECR Login (mandatory for push) ---
+                    aws ecr get-login-password --region ${AWS_REGION} \
+                    | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+
+                    # --- Build Docker image ---
+                    # Folder name must match repo folder exactly
+                    # For eureka-server → EUREKA-SERVER/
                     docker build -t eureka-server:${params.IMAGE_TAG} EUREKA-SERVER/
+
+                    # --- Tag image for ECR ---
                     docker tag eureka-server:${params.IMAGE_TAG} ${ECR_REGISTRY}/eureka-server:${params.IMAGE_TAG}
+
+                    # --- Push image to ECR ---
                     docker push ${ECR_REGISTRY}/eureka-server:${params.IMAGE_TAG}
                 """
             }
         }
-         stage('Deploy') {
+          stage('Deploy') {
                      steps {
-                         sh '''
-                             # Copy updated compose file to EC2
+                         sh """
+                             # --- Copy docker-compose.yml from repo root to EC2 ---
+                             # ⚠️ Path is root level now, same for all services
                              scp -i ${EC2_KEY} docker-compose.yml ${EC2_HOST}:/home/ubuntu/his-deployment/
-                             ssh -i ${EC2_KEY} ${EC2_HOST} "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY} && cd /home/ubuntu/his-deployment && echo IMAGE_TAG=${params.IMAGE_TAG} > .env && docker-compose --env-file .env pull && docker-compose --env-file .env up -d"
-                         '''
+
+                             # --- Run deploy commands on EC2 ---
+                             ssh -i ${EC2_KEY} ${EC2_HOST} '
+                                 cd /home/ubuntu/his-deployment &&
+                                 aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY} &&
+                                 echo IMAGE_TAG=${params.IMAGE_TAG} > .env &&
+                                 export IMAGE_TAG=${params.IMAGE_TAG} &&
+                                 docker-compose pull &&
+                                 docker-compose up -d
+                             '
+                         """
                      }
                  }
     }

@@ -1,0 +1,170 @@
+version: "3.8"
+services:
+  config-server:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/config-server:${IMAGE_TAG:?err}
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: "512M"
+        reservations:
+          cpus: "0.25"
+          memory: "256M"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - his-network
+
+  eureka-server:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/eureka-server:${IMAGE_TAG:?err}
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-server
+    restart: unless-stopped
+    networks:
+      - his-network
+
+  api-gateway:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/api-gateway:${IMAGE_TAG:?err}
+    container_name: api-gateway
+    ports:
+      - "8090:8090"
+    depends_on:
+      - config-server
+      - eureka-server
+    restart: unless-stopped
+    networks:
+      - his-network
+
+  auth-service:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/auth-service:${IMAGE_TAG:?err}
+    container_name: auth-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - config-server
+      - eureka-server
+    restart: unless-stopped
+    networks:
+      - his-network
+
+  ar-service:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/ar-service:${IMAGE_TAG:?err}
+    container_name: ar-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - config-server
+      - eureka-server
+    restart: unless-stopped
+    networks:
+      - his-network
+
+  ssa-web-service:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/ssa-web-service:${IMAGE_TAG:?err}
+    container_name: ssa-web-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - config-server
+      - eureka-server
+    restart: unless-stopped
+    networks:
+      - his-network
+
+  admin-service:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/admin-service:${IMAGE_TAG:?err}
+    container_name: admin-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - config-server
+      - eureka-server
+    restart: unless-stopped
+    networks:
+      - his-network
+
+  eligibility-determination-service:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/eligibility-determination-service:${IMAGE_TAG:?err}
+    container_name: eligibility-determination-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - config-server
+      - eureka-server
+    restart: unless-stopped
+    networks:
+      - his-network
+
+  ed-rules-service:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/ed-rules-service:${IMAGE_TAG:?err}
+    container_name: ed-rules-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      - config-server
+      - eureka-server
+    restart: unless-stopped
+    networks:
+      - his-network
+
+  data-collection-service:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/data-collection-service:${IMAGE_TAG:?err}
+    container_name: data-collection-service
+    ports:
+      - "8086:8086"
+    depends_on:
+      - config-server
+      - eureka-server
+    restart: unless-stopped
+    networks:
+      - his-network
+
+  correspondence-service:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/correspondence-service:${IMAGE_TAG:?err}
+    container_name: correspondence-service
+    ports:
+      - "8087:8087"
+    depends_on:
+      - config-server
+      - eureka-server
+    restart: unless-stopped
+    networks:
+      - his-network
+
+  balance-issuance-service:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/balance-issuance-service:${IMAGE_TAG:?err}
+    container_name: balance-issuance-service
+    ports:
+      - "8088:8088"
+    depends_on:
+      - config-server
+      - eureka-server
+    restart: unless-stopped
+    networks:
+      - his-network
+
+  reports-service:
+    image: 802749364888.dkr.ecr.ap-south-1.amazonaws.com/reports-service:${IMAGE_TAG:?err}
+    container_name: reports-service
+    ports:
+      - "8089:8089"
+    depends_on:
+      - config-server
+      - eureka-server
+    restart: unless-stopped
+    networks:
+      - his-network
+
+networks:
+  his-network:
+    driver: bridge
