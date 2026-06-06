@@ -1,5 +1,6 @@
 FROM eclipse-temurin:17-jdk
 WORKDIR /app
-COPY target/BALLANCE-ISSUANCE-0.0.1-SNAPSHOT.jar app.jar
+# --- FIX: Use wildcard to avoid JAR name mismatch ---
+COPY target/*.jar app.jar
 EXPOSE 8088
 ENTRYPOINT ["java","-jar","app.jar"]
