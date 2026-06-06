@@ -37,13 +37,20 @@ pipeline {
             }
         }
          stage('Deploy') {
-                     steps {
-                         sh '''
-                             # Copy updated compose file to EC2
-                             scp -i ${EC2_KEY} docker-compose.yml ${EC2_HOST}:/home/ubuntu/his-deployment/
-                             ssh -i ${EC2_KEY} ${EC2_HOST} "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY} && cd /home/ubuntu/his-deployment && echo IMAGE_TAG=${params.params.IMAGE_TAG} > .env && docker-compose --env-file .env pull && docker-compose --env-file .env up -d"
-                         '''
-                     }
-                 }
+             steps {
+                 sh """
+                     scp -i ${EC2_KEY} docker-compose.yml ${EC2_HOST}:/home/ubuntu/his-deployment/
+                     ssh -i ${EC2_KEY} ${EC2_HOST} '
+                         cd /home/ubuntu/his-deployment &&
+                         aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY} &&
+                         echo IMAGE_TAG=${params.IMAGE_TAG} > .env &&
+                         export IMAGE_TAG=${params.IMAGE_TAG} &&
+                         docker-compose pull &&
+                         docker-compose up -d
+                     '
+                 """
+             }
+         }
+
     }
 }
