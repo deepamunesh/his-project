@@ -32,27 +32,24 @@ pipeline {
                     | docker login --username AWS --password-stdin ${ECR_REGISTRY}
 
                     # Build Docker image
-                    docker build -t config-server:${IMAGE_TAG} CONFIG-SERVER/
+                    docker build -t config-server:${params.IMAGE_TAG} CONFIG-SERVER/
 
                     # Tag image for ECR
-                    docker tag config-server:${IMAGE_TAG} ${ECR_REGISTRY}/config-server:${IMAGE_TAG}
+                    docker tag config-server:${params.IMAGE_TAG} ${ECR_REGISTRY}/config-server:${params.IMAGE_TAG}
 
                     # Push image to ECR
-                    docker push ${ECR_REGISTRY}/config-server:${IMAGE_TAG}
+                    docker push ${ECR_REGISTRY}/config-server:${params.IMAGE_TAG}
                 """
             }
         }
-        stage('Deploy') {
-                    steps {
-                        sh '''
-                            # Copy updated compose file to EC2
-                            scp -i ${EC2_KEY} docker-compose.yml ${EC2_HOST}:/home/ubuntu/his-deployment/
-
-                            # GALAT: IMAGE_TAG=${BUILD_NUMBER}
-                            # SAHI: IMAGE_TAG=${params.IMAGE_TAG}
-                            ssh -i ${EC2_KEY} ${EC2_HOST} "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY} && cd /home/ubuntu/his-deployment && echo IMAGE_TAG=${params.IMAGE_TAG} > .env && docker-compose --env-file .env pull && docker-compose --env-file .env up -d"
-                        '''
-                    }
-                }
+       stage('Deploy') {
+                   steps {
+                       sh '''
+                           # Copy updated compose file to EC2
+                           scp -i ${EC2_KEY} docker-compose.yml ${EC2_HOST}:/home/ubuntu/his-deployment/
+                           ssh -i ${EC2_KEY} ${EC2_HOST} "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY} && cd /home/ubuntu/his-deployment && echo IMAGE_TAG=${params.IMAGE_TAG} > .env && docker-compose --env-file .env pull && docker-compose --env-file .env up -d"
+                       '''
+                   }
+               }
     }
 }

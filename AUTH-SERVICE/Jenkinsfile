@@ -30,9 +30,9 @@ pipeline {
                     # Without this, docker push fails with 403 Forbidden
                     aws ecr get-login-password --region ${AWS_REGION} \
                     | docker login --username AWS --password-stdin ${ECR_REGISTRY}
-                    docker build -t auth-service:${IMAGE_TAG} AUTH-SERVICE/
-                    docker tag auth-service:${IMAGE_TAG} ${ECR_REGISTRY}/auth-service:${IMAGE_TAG}
-                    docker push ${ECR_REGISTRY}/auth-service:${IMAGE_TAG}
+                    docker build -t auth-service:${params.IMAGE_TAG} AUTH-SERVICE/
+                    docker tag auth-service:${params.IMAGE_TAG} ${ECR_REGISTRY}/auth-service:${params.IMAGE_TAG}
+                    docker push ${ECR_REGISTRY}/auth-service:${params.IMAGE_TAG}
                 """
             }
         }
@@ -41,9 +41,6 @@ pipeline {
                          sh '''
                              # Copy updated compose file to EC2
                              scp -i ${EC2_KEY} docker-compose.yml ${EC2_HOST}:/home/ubuntu/his-deployment/
-
-                             # GALAT: IMAGE_TAG=${BUILD_NUMBER}
-                             # SAHI: IMAGE_TAG=${params.IMAGE_TAG}
                              ssh -i ${EC2_KEY} ${EC2_HOST} "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY} && cd /home/ubuntu/his-deployment && echo IMAGE_TAG=${params.IMAGE_TAG} > .env && docker-compose --env-file .env pull && docker-compose --env-file .env up -d"
                          '''
                      }
