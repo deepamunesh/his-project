@@ -1,10 +1,14 @@
 pipeline {
     agent any
+    // --- Add parameters block to accept IMAGE_TAG from parent ---
+        parameters {
+            string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Docker image tag passed from parent pipeline')
+        }
     environment {
         AWS_ACCOUNT_ID = "802749364888"
         AWS_REGION = "ap-south-1"
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        IMAGE_TAG = "${BUILD_NUMBER}"
+        IMAGE_TAG = "${IMAGE_TAG}"
         EC2_HOST = "ubuntu@52.66.168.244"
         EC2_KEY = "/var/lib/jenkins/.ssh/his-key-ap-south-1-openssh.pem"
     }
