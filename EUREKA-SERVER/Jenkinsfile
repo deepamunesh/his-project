@@ -43,24 +43,5 @@ pipeline {
                 """
             }
         }
-          stage('Deploy') {
-                     steps {
-                         sh """
-                             # --- Copy docker-compose.yml from repo root to EC2 ---
-                             # ⚠️ Path is root level now, same for all services
-                             scp -i ${EC2_KEY} docker-compose.yml ${EC2_HOST}:/home/ubuntu/his-deployment/
-
-                             # --- Run deploy commands on EC2 ---
-                             ssh -i ${EC2_KEY} ${EC2_HOST} '
-                                 cd /home/ubuntu/his-deployment &&
-                                 aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY} &&
-                                 echo IMAGE_TAG=${params.IMAGE_TAG} > .env &&
-                                 export IMAGE_TAG=${params.IMAGE_TAG} &&
-                                 docker-compose pull &&
-                                 docker-compose up -d
-                             '
-                         """
-                     }
-                 }
     }
 }
