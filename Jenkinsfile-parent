@@ -2,79 +2,91 @@ pipeline {
     agent any
 
     environment {
-        // Dynamic IMAGE_TAG: use Jenkins build number
         IMAGE_TAG = "${BUILD_NUMBER}"
         AWS_ACCOUNT = "802749364888"
         REGION = "ap-south-1"
     }
 
     stages {
+        // Config Server build pehle rakha (sabhi services ki config isi se aati hai)
         stage('CONFIG-SERVER') {
             steps {
                 build job: 'HIS-Config-Server-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
+
+        // Eureka Server build second rakha (service discovery ke liye mandatory)
         stage('EUREKA-SERVER') {
             steps {
                 build job: 'HIS-Eureka-Server-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
+
+        // API Gateway build third rakha (entry point, depends on Config + Eureka)
         stage('API-GATEWAY') {
             steps {
                 build job: 'HIS-API-Gateway-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
             }
         }
-        stage('AUTH-SERVICE') {
-            steps {
-                build job: 'HIS-Auth-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
-            }
-        }
-        stage('AR-SERVICE') {
-            steps {
-                build job: 'HIS-AR-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
-            }
-        }
-        stage('DATA-COLLECTION-API') {
-            steps {
-                build job: 'HIS-Data-Collection-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
-            }
-        }
-        stage('ELIGIBILITY-DETERMINATION') {
-            steps {
-                build job: 'HIS-Eligibility-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
-            }
-        }
-        stage('ED-RULES-API') {
-            steps {
-                build job: 'HIS-ED-Rules-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
-            }
-        }
-        stage('CORRESPONDENCE-API') {
-            steps {
-                build job: 'HIS-Correspondence-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
-            }
-        }
-        stage('BALLANCE-ISSUANCE') {
-            steps {
-                build job: 'HIS-Ballance-Issuance-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
-            }
-        }
-        stage('ADMIN-API') {
-            steps {
-                build job: 'HIS-Admin-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
-            }
-        }
-        stage('REPORTS-API') {
-            steps {
-                build job: 'HIS-Reports-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
-            }
-        }
-        stage('SSA-WEB-SERVICE') {
-            steps {
-                build job: 'HIS-SSA-Web-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+
+        // CHANGE: Baaki business services ko ek parallel block me rakha
+        //            Pehle sequentially thi → ab ek saath build hongi → build time kam hoga
+        stage('Business Services') {
+            parallel {
+                stage('AUTH-SERVICE') {
+                    steps {
+                        build job: 'HIS-Auth-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                    }
+                }
+                stage('AR-SERVICE') {
+                    steps {
+                        build job: 'HIS-AR-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                    }
+                }
+                stage('DATA-COLLECTION-API') {
+                    steps {
+                        build job: 'HIS-Data-Collection-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                    }
+                }
+                stage('ELIGIBILITY-DETERMINATION') {
+                    steps {
+                        build job: 'HIS-Eligibility-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                    }
+                }
+                stage('ED-RULES-API') {
+                    steps {
+                        build job: 'HIS-ED-Rules-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                    }
+                }
+                stage('CORRESPONDENCE-API') {
+                    steps {
+                        build job: 'HIS-Correspondence-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                    }
+                }
+                stage('BALANCE-ISSUANCE') {
+                    steps {
+                        build job: 'HIS-Balance-Issuance-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                    }
+                }
+                stage('ADMIN-API') {
+                    steps {
+                        build job: 'HIS-Admin-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                    }
+                }
+                stage('REPORTS-API') {
+                    steps {
+                        build job: 'HIS-Reports-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                    }
+                }
+                stage('SSA-WEB-SERVICE') {
+                    steps {
+                        build job: 'HIS-SSA-Web-Service-Pipeline', parameters: [string(name: 'IMAGE_TAG', value: IMAGE_TAG)]
+                    }
+                }
             }
         }
 
+        // Deploy stage same rakha, bas ensure kiya IMAGE_TAG .env me likh raha hai
         stage('Deploy to EC2') {
             steps {
                 sh '''

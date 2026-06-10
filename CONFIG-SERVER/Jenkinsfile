@@ -18,7 +18,10 @@ pipeline {
         }
         stage('Build JAR') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                // --- CHANGE: Added Maven local repo caching to reuse dependencies ---
+                // Earlier: sh 'mvn clean package -DskipTests'
+                // Now: using -Dmaven.repo.local to avoid downloading dependencies every time
+                sh 'mvn clean package -Dmaven.repo.local=/var/jenkins_home/.m2/repository -DskipTests'
             }
         }
         stage('Docker Build & Push') {
