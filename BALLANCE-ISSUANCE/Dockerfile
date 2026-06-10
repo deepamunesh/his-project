@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:21-jdk
 WORKDIR /app
 # --- FIX: Use wildcard to avoid JAR name mismatch ---
 COPY target/*.jar app.jar
